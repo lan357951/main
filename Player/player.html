@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        #controlpanel>span{
+            cursor: pointer;
+            font-family: Webdings;
+            font-size: 3rem;
+            border: 1px solid;
+            box-shadow: 3px 3px 6px black;
+        }
+
+        #controlpanel > select {
+            font-size: 1.5rem;
+            font-family: 標楷體;
+            border: none;
+            appearance: none;
+            -moz-appearance: none;
+            outline: none;
+
+        }
+
+        #controlpanel > div {
+            font-family: Algerian;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <audio id="audio">
+        <source id="song" src="music/sheng-pi-zi.mp3" type="audio/mp3" />
+    </audio>
+
+    <div id="controlpanel">
+        <select id="music">
+            <option value="/music/sheng-pi-zi.mp3">生僻字</option>
+            <option value="/music/tai-yang.mp3">太陽</option>
+            <option value="/music/xiao-zhang.mp3">囂張</option>
+        </select>
+        <hr />
+        <span id="play">4</span>
+        <span id="stop"><</span>
+        <span id="prevsong">9</span>
+        <span id="prevtime">7</span>
+        <span id="nexttime">8</span>
+        <span id="nextsong">:</span>
+        <hr />
+        <div id="duration">00:00 / 00:00</div>
+    </div>
+    <script>
+        //取得document object
+        var audio = document.getElementById("audio");
+        var controlpanel = document.getElementById("controlpanel");
+        var music = document.getElementById("music");
+        var song = document.getElementById("song");
+        var duration = document.getElementById("duration");
+        
+        //加入事件監聽器
+        controlpanel.addEventListener("click", objectEvent);
+        music.addEventListener("change", function () { changeMusic(music.selectedIndex); });
+
+        //各項函數功能
+        //判斷要執行哪一個功能
+        function objectEvent(evt) {
+            //console.log(evt.target.id)
+            obj = evt.target;            
+            switch (obj.id) {
+                case "play":
+                    playMusic(obj);
+                    break;
+                case "pause":
+                    pauseMusic(obj);
+                    break;
+                case "stop":
+                    stopMusic();
+                    break;
+                case "prevtime":
+                    timeChange(false);
+                    break;
+                case "nexttime":
+                    timeChange(true);
+                    break;
+                case "prevsong":
+                    songChange(false);
+                    break;
+                case "nextsong":
+                    songChange(true);
+                    break;
+            }
+        }
+
+        //把撥放時間轉成分數跟秒數
+        function getTime(timeSec) {
+            min = Math.floor(timeSec / 60);
+            sec = timeSec % 60;
+            min = min < 10 ? "0" + min : min; 
+            sec = sec < 10 ? "0" + sec : sec;
+            //十位數小於1補0
+            return min + ":" + sec;
+        }
+
+        //取歌曲秒數資訊       
+        function getDuration() {
+            songDuration = Math.round(audio.duration);
+            songCurrentTime = Math.round(audio.currentTime);
+
+            duration.innerText = getTime(songCurrentTime) + "/" + getTime(songDuration);
+
+            if (songCurrentTime == songDuration) {
+                songChange(true);
+            }
+            console.log(songCurrentTime);
+            setTimeout(getDuration, 1000);
+        }        
+
+        //撥放音樂
+        function playMusic(obj) {
+            obj.innerText = ";";
+            obj.id = "pause";
+            audio.play();
+            getDuration();
+        }
+
+        //暫停音樂
+        function pauseMusic(obj) {
+            obj.innerText = "4";
+            obj.id = "play";
+            audio.pause();
+        }
+
+        //停止音樂
+        function stopMusic() {
+            pauseMusic(obj.previousElementSibling);
+            audio.currentTime = 0;
+        }
+
+        //快轉倒轉
+        function timeChange(flag) {
+            if (flag)
+                audio.currentTime += 10;
+            else
+                audio.currentTime -= 10;
+        }        
+
+        //歌曲更換
+        function changeMusic(index) {
+            //index = music.selectedIndex;
+            song.src = music.options[index].value;
+            music.options[index].selected = true;
+            audio.load();
+            playMusic(music.nextElementSibling.nextElementSibling);            
+        }
+
+        //上一首下一首
+        function songChange(flag) {
+            index = music.selectedIndex;
+            L = music.options.length;
+            if (flag) {
+                if (index < L - 1)
+                    index++;
+                else
+                    index = 0;
+            }
+            else {
+                if (index > 0)
+                    index--;
+                else
+                    index = L -1;
+            }
+            changeMusic(index);
+        }
+
+    </script>
+</body>
+</html>
