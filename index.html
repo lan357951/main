@@ -64,8 +64,7 @@
 
         //各項函數功能
         //判斷要執行哪一個功能
-        function objectEvent(evt) {
-            //console.log(evt.target.id)
+        function objectEvent(evt) {            
             obj = evt.target;            
             switch (obj.id) {
                 case "play":
@@ -111,9 +110,8 @@
 
             if (songCurrentTime == songDuration) {
                 songChange(true);
-            }
-            console.log(songCurrentTime);
-            setTimeout(getDuration, 1000);
+            }            
+            setTimeout(getDuration, 100);
         }        
 
         //撥放音樂
